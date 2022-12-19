@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Concessionaria Carros</string>
+    <string name="description_text">Model: %s\nTipo do veículo: %s\Placa: %s</string>
+</resources>
