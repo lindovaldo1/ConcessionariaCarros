@@ -205,6 +205,47 @@ fun CarrosCard(carro: Carro){
 
 }
 
+@Composable
+fun Spinner(
+    itemList: List<TipoVeiculo>,
+    selectedItem: TipoVeiculo,
+    onItemSelected: (selectedItem: TipoVeiculo) -> Unit
+) {
+    var expanded by rememberSaveable() {
+        mutableStateOf(false)
+    }
+
+    OutlinedButton(modifier = Modifier
+        .padding(16.dp),
+        onClick = { expanded = true }
+    ){
+        Text(
+            text = selectedItem.descricao,
+            style = TextStyle(Color.Black),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            modifier = Modifier
+                .weight(1f)
+        )
+        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+    }
+
+    DropdownMenu(expanded = expanded, onDismissRequest = {
+        expanded = false
+    }) {
+
+        itemList.forEach {
+            DropdownMenuItem(onClick = {
+                expanded = false
+                onItemSelected(it)
+            }) {
+                Text(text = it.descricao)
+            }
+        }
+    }
+}
+
+
 fun getValidatedNumber(text: String): String {
 
     return if(text.contains(',')) {
@@ -220,4 +261,5 @@ fun getValidatedNumber(text: String): String {
 @Composable
 fun DefaultPreview() {
     BuildLayout()
+
 }
