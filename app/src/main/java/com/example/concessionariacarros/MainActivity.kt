@@ -83,7 +83,12 @@ fun CarrosCard(carro: Carro){
     var price by remember { mutableStateOf(("")) }
     val numberRegex = remember { "[\\d]*[,]?[\\d]*".toRegex() }
     Column() {
-        Row() {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            elevation = 4.dp
+        ) {
             Column() {
                 OutlinedTextField(modifier = Modifier
                     .fillMaxWidth()
@@ -134,7 +139,7 @@ fun CarrosCard(carro: Carro){
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp)
+                .padding(8.dp)
                 .clickable {
                     expandDetails = !expandDetails
                 },
