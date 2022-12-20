@@ -105,9 +105,7 @@ fun CarrosCard(carro: Carro){
                     .height(60.dp)
                     .weight(0.5f)
 
-            ){
-                Text(text = "")
-            }
+            ){}
             Column(Modifier.weight(15f)
             ){
                 Column(
