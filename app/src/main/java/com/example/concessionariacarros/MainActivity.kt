@@ -115,9 +115,6 @@ fun CarrosCard(carro: Carro){
                         maxLines = 1,
                         modifier = Modifier
                             .widthIn(0.dp, 250.dp)
-                            .clickable {
-                                expandDetails = !expandDetails
-                            }
                     )
                     Row(
                         modifier =
