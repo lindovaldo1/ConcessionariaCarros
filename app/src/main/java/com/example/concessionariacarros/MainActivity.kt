@@ -249,10 +249,10 @@ fun CarrosCard(carro: Carro){
                         expandDetails = !expandDetails
                     },
                     onLongClick = {
-                        if (carro.status) {
-                            carro.status = false;
+                        if (carro.vendido) {
+                            carro.vendido = false;
                         } else {
-                            carro.status = true
+                            carro.vendido = true
                         }
                     }
                 ),
@@ -262,7 +262,7 @@ fun CarrosCard(carro: Carro){
                 Column(
                     modifier = Modifier
                         .background(
-                            if (carro.status) {
+                            if (carro.vendido) {
                                 Color.Red
                             } else {
                                 Color.Green
@@ -285,7 +285,7 @@ fun CarrosCard(carro: Carro){
                     ) {
                         Text(
                             text = carro.modelo,
-                            style =   if (carro.status) {
+                            style =   if (carro.vendido) {
                                 TextStyle(textDecoration = TextDecoration.LineThrough)
                             } else {
                                 TextStyle(textDecoration = TextDecoration.None)
@@ -301,10 +301,10 @@ fun CarrosCard(carro: Carro){
                                         expandDetails = !expandDetails
                                     },
                                     onLongClick = {
-                                        if (carro.status) {
-                                            carro.status = false;
+                                        if (carro.vendido) {
+                                            carro.vendido = false;
                                         } else {
-                                            carro.status = true;
+                                            carro.vendido = true;
                                         }
                                     }
                                 )
@@ -322,9 +322,9 @@ fun CarrosCard(carro: Carro){
                             Text(
                                 text = stringResource(
                                     id = R.string.description_text,
-                                    carro.tipo.descricao,carro.preco,carro.status,
+                                    carro.tipo.descricao,carro.preco,
 
-                                    if (carro.status) {
+                                    if (!carro.vendido) {
                                         "This vehicle is available"
                                     } else {
                                         "This vehicle is sold"
