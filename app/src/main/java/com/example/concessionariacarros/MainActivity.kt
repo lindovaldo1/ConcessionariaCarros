@@ -162,9 +162,9 @@ fun CarroList(carros: List<Carro>, onClick: (carro: Carro) -> Unit) {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    BuildLayout()
-//}
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    BuildLayout()
+}
 
