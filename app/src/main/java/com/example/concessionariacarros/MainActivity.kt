@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BuildLayout() {
 
-    var carroDisplay by remember {
+    var carro by remember {
         mutableStateOf(
             Carro(
                 "",
@@ -91,7 +91,6 @@ fun BuildLayout() {
                 onValueChange = { newValue ->
                     model= newValue
                 }
-
             )
 
             OutlinedTextField(
@@ -184,6 +183,12 @@ fun BuildLayout() {
 
                     Text("Adicionar")
 
+                }
+            }
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                CarroList(carrosList) { item ->
+                    carro = item
                 }
             }
 
@@ -313,6 +318,7 @@ fun getValidatedVehicle(
 
     } else if (modelo.text != "" && preco != "") {
         var carro = Carro(modelo.text, tipo, preco.toDouble(), false);
+        println("\n\n\nAQui\n\n\n\n\n" + carro)
         return carro;
     }
     return null;
