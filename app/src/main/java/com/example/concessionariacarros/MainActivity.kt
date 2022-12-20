@@ -143,6 +143,15 @@ fun CarrosCard(carro: Carro){
     }
 }
 
+@Composable
+fun CarroList(carros: List<Carro>, onClick: (carro: Carro) -> Unit) {
+    LazyColumn {
+        items(carros) { carro ->
+            CarrosCard(carro)
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
