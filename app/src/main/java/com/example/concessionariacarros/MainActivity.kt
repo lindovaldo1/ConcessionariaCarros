@@ -41,6 +41,35 @@ import com.example.concessionariacarros.model.enum.TipoVeiculo
 import java.util.stream.Stream
 
 
+import androidx.activity.compose.setContent
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+
+import androidx.compose.foundation.text.KeyboardActions
+
+import androidx.compose.material.*
+
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+
+import androidx.compose.ui.text.input.ImeAction
+
+import androidx.compose.ui.text.style.TextDecoration
+
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -203,31 +232,46 @@ fun BuildLayout() {
 
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarrosCard(carro: Carro){
 
     var expandDetails by remember { mutableStateOf(false) }
-    Column() {
 
+    Column() {
 
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-                .clickable {
-                    expandDetails = !expandDetails
-                },
+                .combinedClickable(
+                    onClick = {
+                        expandDetails = !expandDetails
+                    },
+                    onLongClick = {
+                        if (carro.status) {
+                            carro.status = false;
+                        } else {
+                            carro.status = true
+                        }
+                    }
+                ),
             elevation = 4.dp
         ){
             Row{
                 Column(
                     modifier = Modifier
-                        .background(Color.Green)
+                        .background(
+                            if (carro.status) {
+                                Color.Red
+                            } else {
+                                Color.Green
+                            }
+                        )
                         .height(60.dp)
                         .weight(0.5f)
 
                 ){
-                    Text(text = "")
                 }
                 Column(Modifier.weight(15f)
                 ){
@@ -241,12 +285,29 @@ fun CarrosCard(carro: Carro){
                     ) {
                         Text(
                             text = carro.modelo,
+                            style =   if (carro.status) {
+                                TextStyle(textDecoration = TextDecoration.LineThrough)
+                            } else {
+                                TextStyle(textDecoration = TextDecoration.None)
+                            },
                             textAlign = TextAlign.Center,
                             fontSize = 24.sp,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
                             modifier = Modifier
                                 .widthIn(0.dp, 250.dp)
+                                .combinedClickable(
+                                    onClick = {
+                                        expandDetails = !expandDetails
+                                    },
+                                    onLongClick = {
+                                        if (carro.status) {
+                                            carro.status = false;
+                                        } else {
+                                            carro.status = true;
+                                        }
+                                    }
+                                )
                         )
                         Row(
                             modifier =
@@ -261,7 +322,14 @@ fun CarrosCard(carro: Carro){
                             Text(
                                 text = stringResource(
                                     id = R.string.description_text,
-                                    carro.tipo.descricao,carro.preco,carro.status
+                                    carro.tipo.descricao,carro.preco,carro.status,
+
+                                    if (carro.status) {
+                                        "This vehicle is available"
+                                    } else {
+                                        "This vehicle is sold"
+                                    }
+
                                 ),
                                 modifier = Modifier.padding(8.dp)
                             )
