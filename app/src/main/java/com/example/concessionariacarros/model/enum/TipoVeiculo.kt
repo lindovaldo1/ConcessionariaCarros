@@ -8,4 +8,6 @@ enum class TipoVeiculo(val descricao: String) {
     PICKUP_TRUCK("PICKUP"),
     SUV("SUV"),
     TRUCK("CAMINHAO"),
+
+
 }
