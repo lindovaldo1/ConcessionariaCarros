@@ -258,7 +258,7 @@ fun CarrosCard(carro: Carro){
                 ),
             elevation = 4.dp
         ){
-            Row{
+            Row(){
                 Column(
                     modifier = Modifier
                         .background(
@@ -268,7 +268,7 @@ fun CarrosCard(carro: Carro){
                                 Color.Green
                             }
                         )
-                        .height(60.dp)
+                        .height(64.dp)
                         .weight(0.5f)
 
                 ){
