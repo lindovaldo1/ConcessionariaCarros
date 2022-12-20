@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BuildLayout() {
+
     var carroDisplay by remember {
         mutableStateOf(
             Carro(
@@ -78,69 +79,100 @@ fun BuildLayout() {
 @Composable
 fun CarrosCard(carro: Carro){
     var expandDetails by remember { mutableStateOf(false) }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .clickable {
-                expandDetails = !expandDetails
-            },
-        elevation = 4.dp
-    ){
-        Row{
-            Column(
-                modifier = Modifier
-                    .background(Color.Green)
-                    .height(60.dp)
-                    .weight(0.5f)
+    var model by remember { mutableStateOf(TextFieldValue("")) }
+    var price by remember { mutableStateOf(("")) }
+    Column() {
+        Row() {
+            Column() {
+                OutlinedTextField(modifier = Modifier
+                    .fillMaxWidth(),
+                    value = model,
+                    label = { Text("Modelo") },
+                    onValueChange = { newValue ->
+                        model= newValue
+                    }
 
-            ){
-                Text(text = "")
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = price,
+                    label = { Text("Preço") },
+                    onValueChange = { newValue ->
+                        price= newValue
+                    }
+                )
             }
-            Column(Modifier.weight(15f)
-            ){
+
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+                .clickable {
+                    expandDetails = !expandDetails
+                },
+            elevation = 4.dp
+        ){
+            Row{
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .clickable {
-                            expandDetails = !expandDetails
-                        }
-                ) {
-                    Text(
-                        text = "Modelo: " + carro.modelo,
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
+                        .background(Color.Green)
+                        .height(60.dp)
+                        .weight(0.5f)
+
+                ){
+                    Text(text = "")
+                }
+                Column(Modifier.weight(15f)
+                ){
+                    Column(
                         modifier = Modifier
-                            .widthIn(0.dp, 250.dp)
-                    )
-                    Row(
-                        modifier =
-                        Modifier.align(Alignment.CenterHorizontally)
-                    ) {
-                    }
-                    AnimatedVisibility(
-                        visible = expandDetails,
-                        enter = fadeIn(initialAlpha = 0f) + expandVertically(),
-                        exit = fadeOut(animationSpec = tween(durationMillis = 250)) + shrinkVertically()
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clickable {
+                                expandDetails = !expandDetails
+                            }
                     ) {
                         Text(
-                            text = stringResource(
-                                id = R.string.description_text,
-                                carro.placa,
-                                carro.tipo.descricao,
-                                carro.status
-                            ),
-                            modifier = Modifier.padding(8.dp)
+                            text = "Modelo: " + carro.modelo,
+                            textAlign = TextAlign.Center,
+                            fontSize = 24.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .widthIn(0.dp, 250.dp)
                         )
+                        Row(
+                            modifier =
+                            Modifier.align(Alignment.CenterHorizontally)
+                        ) {
+                        }
+                        AnimatedVisibility(
+                            visible = expandDetails,
+                            enter = fadeIn(initialAlpha = 0f) + expandVertically(),
+                            exit = fadeOut(animationSpec = tween(durationMillis = 250)) + shrinkVertically()
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    id = R.string.description_text,
+                                    carro.placa,
+                                    carro.tipo.descricao,
+                                    carro.status
+                                ),
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
                     }
                 }
             }
+
         }
 
     }
+
 }
 
 @Preview(showBackground = true)
