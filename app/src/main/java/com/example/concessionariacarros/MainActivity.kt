@@ -60,12 +60,12 @@ fun BuildLayout() {
                 "",
                 TipoVeiculo.SEDAN,
                 0.0,
-                true,
+                false,
 
             )
         )
     }
-    CarrosCard(carro = carroDisplay)
+
 }
 
 
@@ -80,6 +80,7 @@ fun CarrosCard(carro: Carro){
     var options = enumValues<TipoVeiculo>().toList()
     var expanded by remember { mutableStateOf(false) }
     val mContext = LocalContext.current
+    val carrosList = remember { mutableStateListOf<Carro>() }
 
 
 
@@ -179,12 +180,11 @@ fun CarrosCard(carro: Carro){
                     Button(
                         onClick = {
                             if (getValidatedVehicle(model, price, selectedOptionText, mContext) != null) {
-                                CarroList.add(
-                                    registerVehicle(
+                                carrosList.add(
+                                    getValidatedVehicle(
                                         model,
                                         price,
-                                        year,
-                                        selectedName,
+                                        selectedOptionText,
                                         mContext
                                     )!!
                                 );
