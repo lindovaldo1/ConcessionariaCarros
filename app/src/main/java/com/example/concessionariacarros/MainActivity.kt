@@ -70,7 +70,7 @@ fun BuildLayout() {
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var price by remember { mutableStateOf(("")) }
     var selectedOptionText by rememberSaveable() { mutableStateOf(TipoVeiculo.SEDAN.descricao) }
-    val numberRegex = remember { "[\\d]*[,]?[\\d]*".toRegex() }
+    val numberRegex = remember { "[\\d]*[.]?[\\d]*".toRegex() }
     var options = enumValues<TipoVeiculo>().toList()
     var expanded by remember { mutableStateOf(false) }
     val mContext = LocalContext.current
@@ -237,7 +237,7 @@ fun CarrosCard(carro: Carro){
                             }
                     ) {
                         Text(
-                            text = "Modelo: " + carro.modelo,
+                            text = carro.modelo,
                             textAlign = TextAlign.Center,
                             fontSize = 24.sp,
                             overflow = TextOverflow.Ellipsis,
@@ -258,8 +258,7 @@ fun CarrosCard(carro: Carro){
                             Text(
                                 text = stringResource(
                                     id = R.string.description_text,
-                                    carro.tipo.descricao,
-                                    carro.status
+                                    carro.tipo.descricao,carro.preco,carro.status
                                 ),
                                 modifier = Modifier.padding(8.dp)
                             )
@@ -287,12 +286,12 @@ fun CarroList(carros: List<Carro>, onClick: (carro: Carro) -> Unit) {
 
 fun getValidatedNumber(text: String): String {
 
-    return if(text.contains(',')) {
-        val beforeDecimal = text.substringBefore(',')
-        val afterDecimal = text.substringAfter(',')
-        beforeDecimal + "," + afterDecimal.take(2)
+    return if(text.contains('.')) {
+        val beforeDecimal = text.substringBefore('.')
+        val afterDecimal = text.substringAfter('.')
+        beforeDecimal + "." + afterDecimal.take(2)
     } else {
-        text + ",00"
+        text + ".00"
     }
 }
 
@@ -318,7 +317,6 @@ fun getValidatedVehicle(
 
     } else if (modelo.text != "" && preco != "") {
         var carro = Carro(modelo.text, tipo, preco.toDouble(), false);
-        println("\n\n\nAQui\n\n\n\n\n" + carro)
         return carro;
     }
     return null;
