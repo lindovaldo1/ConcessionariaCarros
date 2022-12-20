@@ -69,6 +69,7 @@ fun BuildLayout() {
                 "chevrolet",
                 TipoVeiculo.SEDAN,
                 "ABC-1234",
+                0.0,
                 false
             )
         )
@@ -205,7 +206,6 @@ fun CarrosCard(carro: Carro){
 }
 
 fun getValidatedNumber(text: String): String {
-
 
     return if(text.contains(',')) {
         val beforeDecimal = text.substringBefore(',')
