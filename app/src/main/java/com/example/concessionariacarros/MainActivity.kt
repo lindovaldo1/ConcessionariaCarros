@@ -1,24 +1,10 @@
 package com.example.concessionariacarros
 
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.concessionariacarros.model.Carro
-import com.example.concessionariacarros.model.enum.TipoVeiculo
-
 import android.content.Context
+import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -29,34 +15,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-
-
-
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.toSize
+import com.example.concessionariacarros.model.*
+import com.example.concessionariacarros.model.enum.TipoVeiculo
+import java.util.stream.Stream
 
 
 class MainActivity : ComponentActivity() {
@@ -75,11 +57,11 @@ fun BuildLayout() {
     var carroDisplay by remember {
         mutableStateOf(
             Carro(
-                "chevrolet",
+                "",
                 TipoVeiculo.SEDAN,
-                "ABC-1234",
                 0.0,
-                false
+                true,
+
             )
         )
     }
@@ -87,12 +69,22 @@ fun BuildLayout() {
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CarrosCard(carro: Carro){
     var expandDetails by remember { mutableStateOf(false) }
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var price by remember { mutableStateOf(("")) }
+    var selectedOptionText by rememberSaveable() { mutableStateOf(TipoVeiculo.SEDAN.descricao) }
     val numberRegex = remember { "[\\d]*[,]?[\\d]*".toRegex() }
+    var options = enumValues<TipoVeiculo>().toList()
+    var expanded by remember { mutableStateOf(false) }
+    val mContext = LocalContext.current
+
+
+
+
+
     Column() {
         Card(
             modifier = Modifier
@@ -128,12 +120,75 @@ fun CarrosCard(carro: Carro){
 
                     }
                 )
+
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = {
+                        expanded = !expanded
+                    },
+
+                ) {
+                    TextField(
+                        readOnly = true,
+                        value = selectedOptionText,
+                        onValueChange = { },
+                        label = { Text("Tipo") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expanded
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 8.dp)
+                            .border(
+                                1.dp,
+                                colorResource(R.color.cinza_borda),
+                                shape = RoundedCornerShape(5.dp, 5.dp, 0.dp, 0.dp)
+                            ),
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(backgroundColor = Color.White),
+
+
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = {
+                            expanded = false
+                        }
+                    ) {
+                        options.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedOptionText = selectionOption.descricao
+                                    expanded = false
+                                }
+                            ) {
+                                Text(text = selectionOption.descricao)
+                            }
+                        }
+                    }
+                }
+
+
+
+
                 Column(modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Button(
                         onClick = {
-
+                            if (getValidatedVehicle(model, price, selectedOptionText, mContext) != null) {
+                                CarroList.add(
+                                    registerVehicle(
+                                        model,
+                                        price,
+                                        year,
+                                        selectedName,
+                                        mContext
+                                    )!!
+                                );
+                            }
                         },
 
                         ) {
@@ -198,7 +253,6 @@ fun CarrosCard(carro: Carro){
                             Text(
                                 text = stringResource(
                                     id = R.string.description_text,
-                                    carro.placa,
                                     carro.tipo.descricao,
                                     carro.status
                                 ),
@@ -215,46 +269,6 @@ fun CarrosCard(carro: Carro){
 
 }
 
-@Composable
-fun Spinner(
-    itemList: List<TipoVeiculo>,
-    selectedItem: TipoVeiculo,
-    onItemSelected: (selectedItem: TipoVeiculo) -> Unit
-) {
-    var expanded by rememberSaveable() {
-        mutableStateOf(false)
-    }
-
-    OutlinedButton(modifier = Modifier
-        .padding(16.dp),
-        onClick = { expanded = true }
-    ){
-        Text(
-            text = selectedItem.descricao,
-            style = TextStyle(Color.Black),
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            modifier = Modifier
-                .weight(1f)
-        )
-        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-    }
-
-    DropdownMenu(expanded = expanded, onDismissRequest = {
-        expanded = false
-    }) {
-
-        itemList.forEach {
-            DropdownMenuItem(onClick = {
-                expanded = false
-                onItemSelected(it)
-            }) {
-                Text(text = it.descricao)
-            }
-        }
-    }
-}
-
 
 fun getValidatedNumber(text: String): String {
 
@@ -265,6 +279,33 @@ fun getValidatedNumber(text: String): String {
     } else {
         text + ",00"
     }
+}
+
+fun getValidatedVehicle(
+    modelo: TextFieldValue,
+    preco: String,
+    tipoString: String,
+    mContext: Context
+): Carro? {
+    var tipo : TipoVeiculo = TipoVeiculo.SEDAN
+    var tipos = enumValues<TipoVeiculo>().toList()
+    tipos.forEach {
+       if (tipoString.equals(it.descricao)){
+           tipo = it
+       }
+    }
+    if (modelo.text == "") {
+        Toast.makeText(mContext, "Modelo inválido", Toast.LENGTH_LONG).show()
+        return null;
+    } else if (preco == "") {
+        Toast.makeText(mContext, "Preço inválido", Toast.LENGTH_LONG).show()
+        return null;
+
+    } else if (modelo.text != "" && preco != "") {
+        var carro = Carro(modelo.text, tipo, preco.toDouble(), false);
+        return carro;
+    }
+    return null;
 }
 
 @Composable
@@ -279,7 +320,9 @@ fun CarroList(carros: List<Carro>, onClick: (carro: Carro) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
+
     BuildLayout()
+
 
 }
 
