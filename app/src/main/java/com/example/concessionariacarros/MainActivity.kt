@@ -77,6 +77,7 @@ fun BuildLayout() {
                 "chevrolet",
                 TipoVeiculo.SEDAN,
                 "ABC-1234",
+                0.0,
                 false
             )
         )
@@ -139,8 +140,8 @@ fun CarrosCard(carro: Carro){
                         Text(
                             text = stringResource(
                                 id = R.string.description_text,
-                                carro.placa,
                                 carro.tipo.descricao,
+                                carro.preco,
                                 carro.status
                             ),
                             modifier = Modifier.padding(8.dp)
