@@ -310,10 +310,10 @@ fun getValidatedVehicle(
        }
     }
     if (modelo.text == "") {
-        Toast.makeText(mContext, "Modelo inválido", Toast.LENGTH_LONG).show()
+        Toast.makeText(mContext, "O modelo não pode ser vazio", Toast.LENGTH_LONG).show()
         return null;
     } else if (preco == "") {
-        Toast.makeText(mContext, "Preço inválido", Toast.LENGTH_LONG).show()
+        Toast.makeText(mContext, "O preço não pode ser vazio", Toast.LENGTH_LONG).show()
         return null;
 
     } else if (modelo.text != "" && preco != "") {
