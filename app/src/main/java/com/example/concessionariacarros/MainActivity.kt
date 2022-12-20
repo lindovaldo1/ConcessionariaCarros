@@ -81,11 +81,13 @@ fun CarrosCard(carro: Carro){
     var expandDetails by remember { mutableStateOf(false) }
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var price by remember { mutableStateOf(("")) }
+    val numberRegex = remember { "[\\d]*[,]?[\\d]*".toRegex() }
     Column() {
         Row() {
             Column() {
                 OutlinedTextField(modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(all = 8.dp),
                     value = model,
                     label = { Text("Modelo") },
                     onValueChange = { newValue ->
@@ -96,13 +98,35 @@ fun CarrosCard(carro: Carro){
 
                 OutlinedTextField(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(all = 8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
                     value = price,
                     label = { Text("Preço") },
-                    onValueChange = { newValue ->
-                        price= newValue
+                    onValueChange = {
+                        if (numberRegex.matches(it)) {
+                                price = getValidatedNumber(it)
+                        }
+
+
                     }
                 )
+                Column(modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Button(
+                        onClick = {
+
+                        },
+
+                        ) {
+
+                        Text("Adicionar")
+
+                    }
+                }
+
             }
 
         }
@@ -173,6 +197,18 @@ fun CarrosCard(carro: Carro){
 
     }
 
+}
+
+fun getValidatedNumber(text: String): String {
+
+
+    return if(text.contains(',')) {
+        val beforeDecimal = text.substringBefore(',')
+        val afterDecimal = text.substringAfter(',')
+        beforeDecimal + "," + afterDecimal.take(2)
+    } else {
+        text + ",00"
+    }
 }
 
 @Preview(showBackground = true)
