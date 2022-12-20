@@ -6,6 +6,7 @@ data class Carro (
     var modelo: String ="",
     var tipo:TipoVeiculo,
     var placa: String = "",
+    var preco: Double = 0.0,
     var status: Boolean,
     var id: Long = 0L,
 )
