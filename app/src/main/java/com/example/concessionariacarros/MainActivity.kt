@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BuildLayout() {
 
@@ -66,13 +67,6 @@ fun BuildLayout() {
         )
     }
 
-}
-
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun CarrosCard(carro: Carro){
-    var expandDetails by remember { mutableStateOf(false) }
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var price by remember { mutableStateOf(("")) }
     var selectedOptionText by rememberSaveable() { mutableStateOf(TipoVeiculo.SEDAN.descricao) }
@@ -82,125 +76,131 @@ fun CarrosCard(carro: Carro){
     val mContext = LocalContext.current
     val carrosList = remember { mutableStateListOf<Carro>() }
 
-
-
-
-
-    Column() {
-        Card(
-            modifier = Modifier
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = 4.dp
+    ) {
+        Column() {
+            OutlinedTextField(modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = 4.dp
-        ) {
-            Column() {
-                OutlinedTextField(modifier = Modifier
+                .padding(all = 8.dp),
+                value = model,
+                label = { Text("Modelo") },
+                onValueChange = { newValue ->
+                    model= newValue
+                }
+
+            )
+
+            OutlinedTextField(
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(all = 8.dp),
-                    value = model,
-                    label = { Text("Modelo") },
-                    onValueChange = { newValue ->
-                        model= newValue
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                value = price,
+                label = { Text("Preço") },
+                onValueChange = {
+                    if (numberRegex.matches(it)) {
+                        price = getValidatedNumber(it)
                     }
 
-                )
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(all = 8.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    value = price,
-                    label = { Text("Preço") },
-                    onValueChange = {
-                        if (numberRegex.matches(it)) {
-                                price = getValidatedNumber(it)
-                        }
+                }
+            )
 
 
-                    }
-                )
-
-
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = {
-                        expanded = !expanded
-                    },
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = !expanded
+                },
 
                 ) {
-                    TextField(
-                        readOnly = true,
-                        value = selectedOptionText,
-                        onValueChange = { },
-                        label = { Text("Tipo") },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                expanded = expanded
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(all = 8.dp)
-                            .border(
-                                1.dp,
-                                colorResource(R.color.cinza_borda),
-                                shape = RoundedCornerShape(5.dp, 5.dp, 0.dp, 0.dp)
-                            ),
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(backgroundColor = Color.White),
+                TextField(
+                    readOnly = true,
+                    value = selectedOptionText,
+                    onValueChange = { },
+                    label = { Text("Tipo") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(all = 8.dp)
+                        .border(
+                            1.dp,
+                            colorResource(R.color.cinza_borda),
+                            shape = RoundedCornerShape(5.dp, 5.dp, 0.dp, 0.dp)
+                        ),
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(backgroundColor = Color.White),
 
 
                     )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-                            expanded = false
-                        }
-                    ) {
-                        options.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    selectedOptionText = selectionOption.descricao
-                                    expanded = false
-                                }
-                            ) {
-                                Text(text = selectionOption.descricao)
-                            }
-                        }
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
                     }
-                }
-
-
-
-
-                Column(modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Button(
-                        onClick = {
-                            if (getValidatedVehicle(model, price, selectedOptionText, mContext) != null) {
-                                carrosList.add(
-                                    getValidatedVehicle(
-                                        model,
-                                        price,
-                                        selectedOptionText,
-                                        mContext
-                                    )!!
-                                );
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedOptionText = selectionOption.descricao
+                                expanded = false
                             }
-                        },
-
                         ) {
-
-                        Text("Adicionar")
-
+                            Text(text = selectionOption.descricao)
+                        }
                     }
                 }
+            }
 
+
+
+
+            Column(modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Button(
+                    onClick = {
+                        if (getValidatedVehicle(model, price, selectedOptionText, mContext) != null) {
+                            carrosList.add(
+                                getValidatedVehicle(
+                                    model,
+                                    price,
+                                    selectedOptionText,
+                                    mContext
+                                )!!
+                            );
+                        }
+                    },
+
+                    ) {
+
+                    Text("Adicionar")
+
+                }
             }
 
         }
+
+    }
+
+}
+
+
+
+@Composable
+fun CarrosCard(carro: Carro){
+
+    var expandDetails by remember { mutableStateOf(false) }
+    Column() {
+
 
         Card(
             modifier = Modifier
@@ -269,6 +269,16 @@ fun CarrosCard(carro: Carro){
 
 }
 
+@Composable
+fun CarroList(carros: List<Carro>, onClick: (carro: Carro) -> Unit) {
+    LazyColumn {
+        items(carros) { carro ->
+            CarrosCard(carro)
+        }
+    }
+}
+
+
 
 fun getValidatedNumber(text: String): String {
 
@@ -308,14 +318,6 @@ fun getValidatedVehicle(
     return null;
 }
 
-@Composable
-fun CarroList(carros: List<Carro>, onClick: (carro: Carro) -> Unit) {
-    LazyColumn {
-        items(carros) { carro ->
-            CarrosCard(carro)
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
