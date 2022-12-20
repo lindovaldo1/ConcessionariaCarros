@@ -176,7 +176,9 @@ fun BuildLayout() {
                                     mContext
                                 )!!
                             );
-
+                            model = TextFieldValue("")
+                            price = ""
+                            selectedOptionText = TipoVeiculo.SEDAN.descricao
                         }
                     },
 
