@@ -39,6 +39,46 @@ import androidx.compose.foundation.*
 import androidx.compose.ui.text.style.TextDecoration
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import android.graphics.Typeface
+
+
+
+import android.view.ViewGroup
+import android.widget.LinearLayout
+
+import androidx.compose.animation.Crossfade
+
+import androidx.compose.ui.graphics.toArgb
+
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.viewinterop.AndroidView
+import com.example.concessionariacarros.ui.theme.*
+import com.github.mikephil.charting.charts.PieChart
+
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+
+import java.util.*
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -202,7 +242,9 @@ fun statisticsScreen(vehiclesList: SnapshotStateList<Vehicle>) {
     }
     
     Column() {
-        Card(modifier = Modifier.fillMaxWidth().padding(all = 10.dp), elevation = 4.dp) {
+        Card(modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 10.dp), elevation = 4.dp) {
             Column() {
                 Text(text = "Total de carros no sistema: $totalCars", modifier = Modifier.padding(all = 6.dp), fontSize = 20.sp)
 
@@ -211,6 +253,15 @@ fun statisticsScreen(vehiclesList: SnapshotStateList<Vehicle>) {
                 Text(text = "Carros vendidos: $soldCars", modifier = Modifier.padding(all = 6.dp), fontSize = 18.sp)
             }
         }
+    }
+    var dataToPieChart = listOf(
+        PieChartData("Vendidos", soldCars.toFloat()),
+        PieChartData("Disponíveis", availableCars.toFloat()),
+
+        )
+
+    Column() {
+        PieChart(dataToPieChart, totalCars)
     }
 }
 
@@ -359,6 +410,98 @@ fun addVehicle(
 @Composable
 fun DefaultPreview() {
     BuildLayout()
+}
+
+@Composable
+fun PieChart(data: List<PieChartData>, total: Int) {
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = (
+
+                    if (total === 0 ) {
+                        "Não há dados para mostrar no gráfico"
+                    } else {
+                        "Gráfico"
+                    }
+                ),
+
+                // on below line we are specifying style for our text
+                style = TextStyle.Default,
+
+                // on below line we are specifying font family.
+                fontFamily = FontFamily.Default,
+
+                // on below line we are specifying font style
+                fontStyle = FontStyle.Normal,
+
+                // on below line we are specifying font size.
+                fontSize = 20.sp
+            )
+            Column(
+                modifier = Modifier
+                    .padding(18.dp)
+                    .size(320.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Crossfade(targetState = getPieChartData) { pieChartData ->
+                    AndroidView(factory = { context ->
+                        PieChart(context).apply {
+                            layoutParams = LinearLayout.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                            )
+                            this.description.isEnabled = false
+                            this.isDrawHoleEnabled = false
+                            this.legend.isEnabled = true
+                            this.legend.textSize = 14F
+                            this.legend.horizontalAlignment =
+                                Legend.LegendHorizontalAlignment.CENTER
+                            this.setEntryLabelColor(resources.getColor(R.color.white))
+                        }
+                    },
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(5.dp), update = {
+                            updatePieChartWithData(it, pieChartData, data)
+                        })
+                }
+            }
+        }
+    }
+}
+fun updatePieChartWithData(
+    chart: PieChart,
+    info: List<PieChartData>,
+    data: List<PieChartData>
+) {
+    val entries = ArrayList<PieEntry>()
+    for (i in data.indices) {
+        val item = data[i]
+        entries.add(PieEntry(item.value ?: 0.toFloat(), item.status ?: ""))
+    }
+    val ds = PieDataSet(entries, "")
+    ds.colors = arrayListOf(
+        greenColor.toArgb(),
+        blueColor.toArgb(),
+        redColor.toArgb(),
+        yellowColor.toArgb(),
+    )
+    ds.yValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
+    ds.xValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
+    ds.sliceSpace = 2f
+    ds.valueTextColor = R.color.white
+    ds.valueTextSize = 18f
+    ds.valueTypeface = Typeface.DEFAULT_BOLD
+    val d = PieData(ds)
+    chart.data = d
+    chart.invalidate()
 }
 
 
