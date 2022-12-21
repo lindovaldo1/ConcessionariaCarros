@@ -1,6 +1,7 @@
 package com.example.concessionariacarros
 
 
+import MainScreenView
 import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
@@ -73,17 +74,34 @@ import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContent {
             BuildLayout()
         }
-    }
 }
+}
+
+
+
+@Composable
+fun BuildLayout() {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colors.onPrimary
+    ) {
+        MainScreenView()
+    }
+
+
+
+}
+
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BuildLayout() {
+fun homeScreen(carrosList: SnapshotStateList<Carro>){
 
     var carro by remember {
         mutableStateOf(
@@ -93,7 +111,7 @@ fun BuildLayout() {
                 0.0,
                 false,
 
-            )
+                )
         )
     }
 
@@ -104,13 +122,13 @@ fun BuildLayout() {
     var options = enumValues<TipoVeiculo>().toList()
     var expanded by remember { mutableStateOf(false) }
     val mContext = LocalContext.current
-    val carrosList = remember { mutableStateListOf<Carro>() }
+
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = 4.dp
+    modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp),
+    elevation = 4.dp
     ) {
         Column() {
             OutlinedTextField(modifier = Modifier
@@ -225,6 +243,49 @@ fun BuildLayout() {
     }
 
 }
+
+@Composable
+fun statisticsScreen(vehiclesList: SnapshotStateList<Carro>) {
+    var totalCars = 0;
+    var soldCars  = 0;
+    var availableCars  = 0;
+
+    vehiclesList.forEach { vehicle ->
+        if(vehicle.vendido){
+            soldCars ++;
+        }else{
+            availableCars ++;
+        }
+        totalCars ++;
+    }
+    
+    Column() {
+        Card(modifier = Modifier.fillMaxWidth().padding(all = 10.dp), elevation = 4.dp) {
+            Column() {
+                Text(text = "Total de carros no sistema: " + totalCars, modifier = Modifier.padding(all = 6.dp), fontSize = 20.sp)
+
+                Text(text = "Carros disponíveis: " + availableCars, modifier = Modifier.padding(all = 6.dp), fontSize = 18.sp)
+
+                Text(text = "Carros vendidos: " + soldCars, modifier = Modifier.padding(all = 6.dp), fontSize = 18.sp)
+            }
+
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
