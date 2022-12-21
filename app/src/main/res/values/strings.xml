@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Concessionaria Carros</string>
-    <string name="description_text">Type: %s\nPrice: %s\nSold: %s</string>
+    <string name="description_text">Tipo: %s\nPreço: %s\nStatus: %s</string>
 </resources>

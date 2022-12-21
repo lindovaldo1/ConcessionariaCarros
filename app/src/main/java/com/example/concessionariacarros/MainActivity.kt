@@ -323,9 +323,9 @@ fun CarrosCard(carro: Carro){
                                     carro.tipo.descricao,carro.preco,
 
                                     if (!carro.vendido) {
-                                        "This vehicle is available"
+                                        "Veículo disponível"
                                     } else {
-                                        "This vehicle is sold"
+                                        "Veículo vendido"
                                     }
 
                                 ),
