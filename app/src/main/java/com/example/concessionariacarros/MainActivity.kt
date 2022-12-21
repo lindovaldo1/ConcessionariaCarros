@@ -57,6 +57,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.shadow
 
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -147,7 +148,7 @@ fun BuildLayout() {
                 },
 
                 ) {
-                TextField(
+                OutlinedTextField(
                     readOnly = true,
                     value = selectedOptionText,
                     onValueChange = { },
@@ -159,12 +160,7 @@ fun BuildLayout() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(all = 8.dp)
-                        .border(
-                            1.dp,
-                            colorResource(R.color.cinza_borda),
-                            shape = RoundedCornerShape(5.dp, 5.dp, 0.dp, 0.dp)
-                        ),
+                        .padding(all = 8.dp),
                     colors = ExposedDropdownMenuDefaults.textFieldColors(backgroundColor = Color.White),
 
 
@@ -258,6 +254,7 @@ fun CarrosCard(carro: Carro){
                 ),
             elevation = 4.dp
         ){
+
             Row(){
                 Column(
                     modifier = Modifier
@@ -317,7 +314,8 @@ fun CarrosCard(carro: Carro){
                         AnimatedVisibility(
                             visible = expandDetails,
                             enter = fadeIn(initialAlpha = 0f) + expandVertically(),
-                            exit = fadeOut(animationSpec = tween(durationMillis = 250)) + shrinkVertically()
+                            exit = fadeOut(animationSpec = tween(durationMillis = 250)) + shrinkVertically(),
+
                         ) {
                             Text(
                                 text = stringResource(
