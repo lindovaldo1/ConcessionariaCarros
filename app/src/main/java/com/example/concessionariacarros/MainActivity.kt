@@ -10,15 +10,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,97 +34,57 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.concessionariacarros.model.*
-import com.example.concessionariacarros.model.enum.TipoVeiculo
-import java.util.stream.Stream
-
-
-import androidx.activity.compose.setContent
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
+import com.example.concessionariacarros.model.enum.VehicleType
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-
-import androidx.compose.foundation.text.KeyboardActions
-
-import androidx.compose.material.*
-
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.draw.shadow
-
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
-
-import androidx.compose.ui.text.input.ImeAction
-
 import androidx.compose.ui.text.style.TextDecoration
-
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContent {
             BuildLayout()
         }
+    }
 }
-}
-
-
 
 @Composable
 fun BuildLayout() {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.onPrimary
-    ) {
+    ){
         MainScreenView()
     }
-
-
-
 }
-
-
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun homeScreen(carrosList: SnapshotStateList<Carro>){
+fun homeScreen(vehiclesList: SnapshotStateList<Vehicle>){
 
-    var carro by remember {
+    var vehicle by remember {
         mutableStateOf(
-            Carro(
+            Vehicle(
                 "",
-                TipoVeiculo.SEDAN,
                 0.0,
+                VehicleType.SEDAN,
                 false,
-
-                )
+            )
         )
     }
-
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var price by remember { mutableStateOf(("")) }
-    var selectedOptionText by rememberSaveable() { mutableStateOf(TipoVeiculo.SEDAN.descricao) }
-    val numberRegex = remember { "[\\d]*[.]?[\\d]*".toRegex() }
-    var options = enumValues<TipoVeiculo>().toList()
+    var type by rememberSaveable() { mutableStateOf(VehicleType.SEDAN.description) }
+    val priceRegex = remember { "[\\d]*[.]?[\\d]*".toRegex() }
+    var vehicleTypes = enumValues<VehicleType>().toList()
     var expanded by remember { mutableStateOf(false) }
     val mContext = LocalContext.current
 
-
     Card(
-    modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp),
-    elevation = 4.dp
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = 4.dp
     ) {
         Column() {
             OutlinedTextField(modifier = Modifier
@@ -150,25 +106,21 @@ fun homeScreen(carrosList: SnapshotStateList<Carro>){
                 value = price,
                 label = { Text("Preço") },
                 onValueChange = {
-                    if (numberRegex.matches(it)) {
-                        price = getValidatedNumber(it)
+                    if (priceRegex.matches(it)) {
+                        price = formatVehiclePrice(it)
                     }
-
-
                 }
             )
-
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = {
                     expanded = !expanded
                 },
-
                 ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = selectedOptionText,
+                    value = type,
                     onValueChange = { },
                     label = { Text("Tipo") },
                     trailingIcon = {
@@ -180,78 +132,68 @@ fun homeScreen(carrosList: SnapshotStateList<Carro>){
                         .fillMaxWidth()
                         .padding(all = 8.dp),
                     colors = ExposedDropdownMenuDefaults.textFieldColors(backgroundColor = Color.White),
-
-
-                    )
+                )
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = {
                         expanded = false
                     }
                 ) {
-                    options.forEach { selectionOption ->
+                    vehicleTypes.forEach { selectedType ->
                         DropdownMenuItem(
                             onClick = {
-                                selectedOptionText = selectionOption.descricao
+                                type = selectedType.description
                                 expanded = false
                             }
                         ) {
-                            Text(text = selectionOption.descricao)
+                            Text(text = selectedType.description)
                         }
                     }
                 }
             }
-
-
-
 
             Column(modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(
                     onClick = {
-                        if (getValidatedVehicle(model, price, selectedOptionText, mContext) != null) {
-                            carrosList.add(
-                                getValidatedVehicle(
+                        if (addVehicle(model, price, type, mContext) != null) {
+                            vehiclesList.add(
+                                addVehicle(
                                     model,
                                     price,
-                                    selectedOptionText,
+                                    type,
                                     mContext
                                 )!!
                             );
                             model = TextFieldValue("")
                             price = ""
-                            selectedOptionText = TipoVeiculo.SEDAN.descricao
+                            type = VehicleType.SEDAN.description
                         }
                     },
-
                     ) {
 
                     Text("Adicionar")
-
                 }
             }
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                CarroList(carrosList) { item ->
-                    carro = item
+                listVehicles(vehiclesList) { vehicleItem ->
+                    vehicle = vehicleItem
                 }
             }
-
         }
-
     }
-
 }
 
 @Composable
-fun statisticsScreen(vehiclesList: SnapshotStateList<Carro>) {
+fun statisticsScreen(vehiclesList: SnapshotStateList<Vehicle>) {
     var totalCars = 0;
     var soldCars  = 0;
     var availableCars  = 0;
 
     vehiclesList.forEach { vehicle ->
-        if(vehicle.vendido){
+        if(vehicle.sold){
             soldCars ++;
         }else{
             availableCars ++;
@@ -262,36 +204,19 @@ fun statisticsScreen(vehiclesList: SnapshotStateList<Carro>) {
     Column() {
         Card(modifier = Modifier.fillMaxWidth().padding(all = 10.dp), elevation = 4.dp) {
             Column() {
-                Text(text = "Total de carros no sistema: " + totalCars, modifier = Modifier.padding(all = 6.dp), fontSize = 20.sp)
+                Text(text = "Total de carros no sistema: $totalCars", modifier = Modifier.padding(all = 6.dp), fontSize = 20.sp)
 
-                Text(text = "Carros disponíveis: " + availableCars, modifier = Modifier.padding(all = 6.dp), fontSize = 18.sp)
+                Text(text = "Carros disponíveis: $availableCars", modifier = Modifier.padding(all = 6.dp), fontSize = 18.sp)
 
-                Text(text = "Carros vendidos: " + soldCars, modifier = Modifier.padding(all = 6.dp), fontSize = 18.sp)
+                Text(text = "Carros vendidos: $soldCars", modifier = Modifier.padding(all = 6.dp), fontSize = 18.sp)
             }
-
         }
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CarrosCard(carro: Carro){
+fun VehicleInfo(vehicle: Vehicle){
 
     var expandDetails by remember { mutableStateOf(false) }
 
@@ -306,21 +231,16 @@ fun CarrosCard(carro: Carro){
                         expandDetails = !expandDetails
                     },
                     onLongClick = {
-                        if (carro.vendido) {
-                            carro.vendido = false;
-                        } else {
-                            carro.vendido = true
-                        }
+                        vehicle.sold = !vehicle.sold
                     }
                 ),
             elevation = 4.dp
         ){
-
             Row(){
                 Column(
                     modifier = Modifier
                         .background(
-                            if (carro.vendido) {
+                            if (vehicle.sold) {
                                 Color.Red
                             } else {
                                 Color.Green
@@ -342,8 +262,8 @@ fun CarrosCard(carro: Carro){
                             }
                     ) {
                         Text(
-                            text = carro.modelo,
-                            style =   if (carro.vendido) {
+                            text = vehicle.model,
+                            style =   if (vehicle.sold) {
                                 TextStyle(textDecoration = TextDecoration.LineThrough)
                             } else {
                                 TextStyle(textDecoration = TextDecoration.None)
@@ -354,18 +274,7 @@ fun CarrosCard(carro: Carro){
                             maxLines = 1,
                             modifier = Modifier
                                 .widthIn(0.dp, 250.dp)
-                                .combinedClickable(
-                                    onClick = {
-                                        expandDetails = !expandDetails
-                                    },
-                                    onLongClick = {
-                                        if (carro.vendido) {
-                                            carro.vendido = false;
-                                        } else {
-                                            carro.vendido = true;
-                                        }
-                                    }
-                                )
+
                         )
                         Row(
                             modifier =
@@ -381,14 +290,13 @@ fun CarrosCard(carro: Carro){
                             Text(
                                 text = stringResource(
                                     id = R.string.description_text,
-                                    carro.tipo.descricao,carro.preco,
+                                    vehicle.type.description,vehicle.price,
 
-                                    if (!carro.vendido) {
+                                    if (!vehicle.sold) {
                                         "Veículo disponível"
                                     } else {
                                         "Veículo vendido"
                                     }
-
                                 ),
                                 modifier = Modifier.padding(8.dp)
                             )
@@ -396,70 +304,61 @@ fun CarrosCard(carro: Carro){
                     }
                 }
             }
-
         }
-
     }
-
 }
 
 @Composable
-fun CarroList(carros: List<Carro>, onClick: (carro: Carro) -> Unit) {
+fun listVehicles(vehicles: List<Vehicle>, onClick: (vehicle: Vehicle) -> Unit) {
     LazyColumn {
-        items(carros) { carro ->
-            CarrosCard(carro)
+        items(vehicles) { vehicle ->
+            VehicleInfo(vehicle)
         }
     }
 }
 
-
-
-fun getValidatedNumber(text: String): String {
+fun formatVehiclePrice(text: String): String {
 
     return if(text.contains('.')) {
         val beforeDecimal = text.substringBefore('.')
         val afterDecimal = text.substringAfter('.')
         beforeDecimal + "." + afterDecimal.take(2)
     } else {
-        text + ".00"
+        "$text.00"
     }
 }
 
-fun getValidatedVehicle(
-    modelo: TextFieldValue,
-    preco: String,
-    tipoString: String,
+fun addVehicle(
+    model: TextFieldValue,
+    price: String,
+    typeString: String,
     mContext: Context
-): Carro? {
-    var tipo : TipoVeiculo = TipoVeiculo.SEDAN
-    var tipos = enumValues<TipoVeiculo>().toList()
-    tipos.forEach {
-       if (tipoString.equals(it.descricao)){
-           tipo = it
+): Vehicle? {
+    var type : VehicleType = VehicleType.SEDAN
+    var types = enumValues<VehicleType>().toList()
+    types.forEach {
+       if (typeString.equals(it.description)){
+           type = it
        }
     }
-    if (modelo.text == "") {
+    if (model.text == "") {
         Toast.makeText(mContext, "O modelo não pode ser vazio", Toast.LENGTH_LONG).show()
         return null;
-    } else if (preco == "") {
+    } else if (price == "") {
         Toast.makeText(mContext, "O preço não pode ser vazio", Toast.LENGTH_LONG).show()
         return null;
 
-    } else if (modelo.text != "" && preco != "") {
-        var carro = Carro(modelo.text, tipo, preco.toDouble(), false);
-        return carro;
+    } else if (model.text != "" && price != "") {
+        var vehicle = Vehicle(model.text, price.toDouble(), type, false);
+        return vehicle;
     }
     return null;
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-
     BuildLayout()
-
-
 }
 
 

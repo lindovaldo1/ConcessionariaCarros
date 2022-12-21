@@ -1,6 +1,6 @@
 package com.example.concessionariacarros.model.enum
 
-enum class TipoVeiculo(val descricao: String) {
+enum class VehicleType(val description: String) {
     VAN("Van"),
     HATCH("Hatch"),
     SEDAN("Sedan"),

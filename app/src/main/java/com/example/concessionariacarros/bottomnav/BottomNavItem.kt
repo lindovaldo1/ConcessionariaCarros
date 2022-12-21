@@ -1,4 +1,4 @@
-package com.example.concessionariacarros.bottleNav
+package com.example.concessionariacarros.bottomnav
 
 import com.example.concessionariacarros.R
 
